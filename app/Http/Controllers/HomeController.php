@@ -20,9 +20,55 @@ class HomeController extends Controller
         // 5. Ambil list penerbit unik untuk opsi dropdown filter
         // 6. Return view 'home' dengan data buku dan list penerbit
 
-        $buku = Buku::paginate(8);
-        $listPenerbit = collect();
+        $query = Buku::query();
 
+        // 1. Pencarian berdasarkan judul, penulis, atau penerbit
+        if ($request->filled('search')) {
+            $search = $request->search;
+
+            $query->where(function ($q) use ($search) {
+                $q->where('judul', 'like', "%{$search}%")
+                  ->orWhere('penulis', 'like', "%{$search}%")
+                  ->orWhere('penerbit', 'like', "%{$search}%");
+            });
+        }
+
+        // 2. Filter berdasarkan penerbit
+        if ($request->filled('penerbit')) {
+            $query->where('penerbit', $request->penerbit);
+        }
+
+        // Filter berdasarkan ketersediaan stok
+        if ($request->filled('status')) {
+            if ($request->status == 'tersedia') {
+                $query->where('stok', '>', 0);
+            } elseif ($request->status == 'habis') {
+                $query->where('stok', '<=', 0);
+            }
+        }
+
+        // 3. Pengurutan data
+        if ($request->sort == 'judul') {
+            $query->orderBy('judul', 'asc');
+        } elseif ($request->sort == 'tahun') {
+            $query->orderBy('tahun_terbit', 'desc');
+        } elseif ($request->sort == 'stok') {
+            $query->orderBy('stok', 'desc');
+        } else {
+            $query->latest();
+        }
+
+        // 4. Paginasi 8 data dengan mempertahankan parameter URL
+        $buku = $query->paginate(8)->withQueryString();
+
+        // 5. Mengambil daftar penerbit unik
+        $listPenerbit = Buku::select('penerbit')
+            ->distinct()
+            ->whereNotNull('penerbit')
+            ->orderBy('penerbit')
+            ->pluck('penerbit');
+
+        // 6. Mengirim data ke halaman home
         return view('home', compact('buku', 'listPenerbit'));
     }
 

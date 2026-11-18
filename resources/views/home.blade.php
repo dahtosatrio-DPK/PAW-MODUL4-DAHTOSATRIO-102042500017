@@ -1,5 +1,7 @@
+
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,9 +13,11 @@
             background-color: #f8fafc;
             font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
         }
+
         .navbar-brand { font-weight: 700; }
         .book-card:hover { transform: translateY(-4px); transition: transform 0.2s ease; }
         .book-cover { height: 240px; object-fit: cover; width: 100%; }
+
         .book-cover-placeholder {
             height: 240px;
             display: flex;
@@ -25,8 +29,8 @@
         }
     </style>
 </head>
-<body>
 
+<body>
     {{-- Navbar --}}
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
         <div class="container">
@@ -81,7 +85,6 @@
     </nav>
 
     <div class="container py-5">
-
         {{-- Flash Messages --}}
         @if(session('success'))
             <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -89,6 +92,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
         @endif
+
         @if(session('error'))
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
                 {{ session('error') }}
@@ -106,14 +110,15 @@
                 <div class="col-lg-11">
                     <form action="{{ url()->current() }}" method="GET" class="card shadow-sm border-0 p-3 bg-light text-start">
                         <div class="row g-2 align-items-center">
+
                             {{-- Input Pencarian --}}
                             <div class="col-md-4">
                                 <div class="input-group">
                                     <span class="input-group-text bg-white border-end-0">
                                         <i class="bi bi-search text-muted"></i>
                                     </span>
-                                    <input type="text" name="search" class="form-control border-start-0" 
-                                           placeholder="Cari judul, penulis..." 
+                                    <input type="text" name="search" class="form-control border-start-0"
+                                           placeholder="Cari judul, penulis..."
                                            value="{{ request('search') }}">
                                 </div>
                             </div>
@@ -167,6 +172,7 @@
                                     </button>
                                 @endif
                             </div>
+
                         </div>
                     </form>
                 </div>
@@ -174,12 +180,12 @@
 
             @if(request('search') || request('penerbit') || request('status') || request('sort'))
                 <p class="text-muted mt-3 small">
-                    Menampilkan hasil filter: 
+                    Menampilkan hasil filter:
                     @if(request('search')) pencarian <strong>"{{ request('search') }}"</strong>@endif
-                    @if(request('penerbit')) &bull; penerbit <strong>"{{ request('penerbit') }}"</strong>@endif
-                    @if(request('status')) &bull; status <strong>"{{ request('status') === 'tersedia' ? 'Stok Tersedia' : 'Stok Habis' }}"</strong>@endif
-                    @if(request('sort')) &bull; urutan <strong>"{{ request('sort') }}"</strong>@endif
-                    &mdash; ditemukan <strong>{{ $buku->total() }}</strong> buku
+                    @if(request('penerbit')) • penerbit <strong>"{{ request('penerbit') }}"</strong>@endif
+                    @if(request('status')) • status <strong>"{{ request('status') === 'tersedia' ? 'Stok Tersedia' : 'Stok Habis' }}"</strong>@endif
+                    @if(request('sort')) • urutan <strong>"{{ request('sort') }}"</strong>@endif
+                    — ditemukan <strong>{{ $buku->total() }}</strong> buku
                 </p>
             @endif
         </div>
@@ -187,42 +193,44 @@
         {{-- Grid Katalog Buku --}}
         <div class="row">
             @forelse($buku as $item)
-            <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
-                <div class="card h-100 shadow-sm border-0 book-card">
-                    @if($item->cover)
-                        <img src="{{ asset('storage/' . $item->cover) }}" class="card-img-top book-cover" alt="{{ $item->judul }}">
-                    @else
-                        <div class="book-cover-placeholder">
-                            <div class="text-center">
-                                <i class="bi bi-book fs-1 d-block mb-1"></i>
-                                <span>Tidak Ada Sampul</span>
+                <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+                    <div class="card h-100 shadow-sm border-0 book-card">
+                        @if($item->cover)
+                            <img src="{{ asset('storage/' . $item->cover) }}" class="card-img-top book-cover" alt="{{ $item->judul }}">
+                        @else
+                            <div class="book-cover-placeholder">
+                                <div class="text-center">
+                                    <i class="bi bi-book fs-1 d-block mb-1"></i>
+                                    <span>Tidak Ada Sampul</span>
+                                </div>
+                            </div>
+                        @endif
+
+                        <div class="card-body d-flex flex-column">
+                            <h6 class="card-title fw-bold text-truncate mb-1" title="{{ $item->judul }}">{{ $item->judul }}</h6>
+                            <p class="card-text text-muted small mb-2">{{ $item->penulis }}</p>
+                            <div class="mt-auto">
+                                <span class="badge {{ $item->stok > 0 ? 'bg-success' : 'bg-danger' }} mb-2">
+                                    {{ $item->stok > 0 ? 'Tersedia (' . $item->stok . ')' : 'Stok Kosong' }}
+                                </span>
                             </div>
                         </div>
-                    @endif
-                    <div class="card-body d-flex flex-column">
-                        <h6 class="card-title fw-bold text-truncate mb-1" title="{{ $item->judul }}">{{ $item->judul }}</h6>
-                        <p class="card-text text-muted small mb-2">{{ $item->penulis }}</p>
-                        <div class="mt-auto">
-                            <span class="badge {{ $item->stok > 0 ? 'bg-success' : 'bg-danger' }} mb-2">
-                                {{ $item->stok > 0 ? 'Tersedia (' . $item->stok . ')' : 'Stok Kosong' }}
-                            </span>
+
+                        <div class="card-footer bg-white border-top-0 pt-0 pb-3">
+                            <a href="{{ route('buku.publik.show', $item->id) }}" class="btn btn-outline-primary btn-sm w-100">
+                                <i class="bi bi-eye me-1"></i> Lihat Detail
+                            </a>
                         </div>
                     </div>
-                    <div class="card-footer bg-white border-top-0 pt-0 pb-3">
-                        <a href="{{ route('buku.publik.show', $item->id) }}" class="btn btn-outline-primary btn-sm w-100">
-                            <i class="bi bi-eye me-1"></i> Lihat Detail
-                        </a>
-                    </div>
                 </div>
-            </div>
             @empty
-            <div class="col-12 text-center py-5">
-                <i class="bi bi-search fs-1 text-muted d-block mb-3"></i>
-                <p class="text-muted fs-5">Buku tidak ditemukan.</p>
-                @if(request('search'))
-                    <a href="{{ route('home') }}" class="btn btn-outline-primary btn-sm">Lihat Semua Buku</a>
-                @endif
-            </div>
+                <div class="col-12 text-center py-5">
+                    <i class="bi bi-search fs-1 text-muted d-block mb-3"></i>
+                    <p class="text-muted fs-5">Buku tidak ditemukan.</p>
+                    @if(request('search'))
+                        <a href="{{ route('home') }}" class="btn btn-outline-primary btn-sm">Lihat Semua Buku</a>
+                    @endif
+                </div>
             @endforelse
         </div>
 
@@ -236,11 +244,11 @@
 
     <footer class="bg-white py-3 border-top text-center text-muted small mt-5">
         <div class="container">
-            <span>&copy; {{ date('Y') }} TelkomLibrary - Sistem Informasi Perpustakaan Kampus</span>
+            <span>© {{ date('Y') }} TelkomLibrary - Sistem Informasi Perpustakaan Kampus</span>
         </div>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-</html>
 
+</html>
